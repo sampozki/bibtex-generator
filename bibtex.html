@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BibTeX Generator</title>
+  <style>
+    :root{--bg:#0b0e14;--card:#111726;--muted:#7f8ea3;--text:#e5f0ff;--accent:#6aa6ff;--accent2:#9bffd1;--danger:#ff6b6b}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;line-height:1.35;background:linear-gradient(180deg,#0b0e14,#0d1323);color:var(--text)}
+    header{padding:24px 16px;text-align:center}
+    header h1{margin:0 0 6px;font-size:clamp(20px,3vw,28px)}
+    header p{margin:0;color:var(--muted)}
+    .container{display:grid;gap:16px;grid-template-columns:1fr;max-width:1100px;margin:0 auto;padding:16px}
+    @media (min-width:1000px){.container{grid-template-columns:1.1fr .9fr}}
+    .card{background:var(--card);border:1px solid #1a2340;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:16px}
+    .grid{display:grid;gap:10px;grid-template-columns:1fr}
+    @media (min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    label.required{font-weight:bold;color:var(--accent)}
+    input,select,textarea{width:100%;background:#0f1530;border:1px solid #243056;color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
+    textarea{resize:vertical;min-height:140px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;background:#172149;border:1px solid #2a3a73;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;text-decoration:none}
+    .btn:hover{background:#1c295b}
+    .btn.accent{background:#0f2b5c;border-color:#2d64ff}
+    .btn.ghost{background:transparent;border-color:#32468c}
+    .btn.danger{background:#2a0f12;border-color:#6a1d23}
+    code.inline{padding:.2em .4em;background:#0f1530;border:1px solid #243056;border-radius:8px}
+    .hint{font-size:12px;color:var(--muted)}
+    .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid #32468c;background:#0f1530;color:#bcd3ff;font-size:11px}
+    .list{display:flex;flex-direction:column;gap:10px}
+    .item{background:#0f1530;border:1px solid #243056;border-radius:12px;padding:12px}
+    .item .meta{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
+    .item .key{font-weight:600}
+    .item pre{margin:0;white-space:pre-wrap;word-break:break-word}
+    .spacer{height:6px}
+    .footer{color:var(--muted);font-size:12px;text-align:center;padding:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LaTeX/BibTeX Source Generator</h1>
+    <p>Fill the fields → generate a <code class="inline">.bib</code> entry. Save entries in your browser and copy with one click.</p>
+  </header>
+
+  <main class="container">
+    <!-- FORM SIDE -->
+    <section class="card">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="row" style="align-items:center;gap:8px">
+          <span class="pill">Simple web app • no libraries</span>
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="downloadAllBtn" title="Download all saved entries as one .bib file">Download All (.bib)</button>
+          <button class="btn danger" id="clearAllBtn" title="Delete all saved entries">Clear Saved</button>
+        </div>
+      </div>
+
+      <div class="row" style="gap:10px;align-items:flex-end;margin-bottom:12px">
+        <div style="flex:1">
+          <label for="entryType" class="required">Entry type</label>
+          <select id="entryType">
+            <option value="online">@online</option>
+            <option value="article">@article</option>
+            <option value="book">@book</option>
+            <option value="inproceedings">@inproceedings</option>
+            <option value="misc">@misc</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label for="citeKey" id="label-citeKey">Citation key</label>
+          <input id="citeKey" placeholder="e.g. what-is-iac-redhat" />
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label for="author" id="label-author">Author(s)</label>
+          <input id="author" placeholder="Red Hat or Lastname, First and Second, Third" />
+          <div class="hint">Multiple authors separated with <code class="inline">and</code></div>
+        </div>
+        <div>
+          <label for="title" id="label-title">Title</label>
+          <input id="title" placeholder="What is infrastructure as code (IAC)?" />
+        </div>
+        <div>
+          <label for="year" id="label-year">Year</label>
+          <input id="year" type="number" min="1000" max="9999" placeholder="2025" />
+        </div>
+        <div>
+          <label for="month">Month</label>
+          <input id="month" placeholder="Jun or june or 06" />
+        </div>
+        <div>
+          <label for="journal" id="label-journal">Journal</label>
+          <input id="journal" placeholder="Only for @article" />
+        </div>
+        <div>
+          <label for="booktitle" id="label-booktitle">Booktitle</label>
+          <input id="booktitle" placeholder="For @inproceedings" />
+        </div>
+        <div>
+          <label for="publisher" id="label-publisher">Publisher</label>
+          <input id="publisher" placeholder="Publisher / Organization" />
+        </div>
+        <div>
+          <label for="editor">Editor</label>
+          <input id="editor" placeholder="Optional" />
+        </div>
+        <div>
+          <label for="volume">Volume</label>
+          <input id="volume" placeholder="Optional" />
+        </div>
+        <div>
+          <label for="number">Number</label>
+          <input id="number" placeholder="Optional" />
+        </div>
+        <div>
+          <label for="pages">Pages</label>
+          <input id="pages" placeholder="12--34" />
+        </div>
+        <div>
+          <label for="address">Address</label>
+          <input id="address" placeholder="City, Country (optional)" />
+        </div>
+        <div>
+          <label for="organization">Organization</label>
+          <input id="organization" placeholder="Optional" />
+        </div>
+        <div>
+          <label for="doi">DOI</label>
+          <input id="doi" placeholder="10.xxxx/xxxxx" />
+        </div>
+        <div>
+          <label for="url" id="label-url">URL</label>
+          <input id="url" placeholder="https://example.com" />
+        </div>
+        <div>
+          <label for="howpublished">How Published</label>
+          <input id="howpublished" placeholder="Web page, Blog, etc." />
+        </div>
+        <div>
+          <label for="note">Note</label>
+          <input id="note" placeholder="Accessed: 2025-09-02" />
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="row">
+        <button id="genBtn" class="btn accent">Generate</button>
+        <button id="copyBtn" class="btn">Copy current</button>
+        <button id="downloadBtn" class="btn">Download current (.bib)</button>
+        <button id="saveBtn" class="btn">Save to browser</button>
+        <button id="resetBtn" class="btn ghost">Reset form</button>
+      </div>
+
+      <div class="spacer"></div>
+      <label for="output">Output</label>
+      <textarea id="output" placeholder="Your generated BibTeX entry will appear here…"></textarea>
+      <div class="hint">Example format:
+        <code class="inline">@online{ what-is-iac-redhat, author={Red Hat}, title={…}, url={…}, year={2025}, month={Jun} }</code>
+      </div>
+    </section>
+
+    <!-- SAVED SIDE -->
+    <section class="card">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+        <h3 style="margin:0">Saved entries (local)</h3>
+        <span class="hint" id="savedCount">0 items</span>
+      </div>
+      <div class="list" id="savedList"></div>
+    </section>
+  </main>
+
+  <div class="footer">All data stays in your browser (Local Storage). No network calls.</div>
+
+  <template id="saved-item-template">
+    <div class="item">
+      <div class="meta">
+        <span class="key"></span>
+        <div class="row">
+          <button class="btn" data-action="copy">Copy</button>
+          <button class="btn" data-action="download">.bib</button>
+          <button class="btn ghost" data-action="load">Load</button>
+          <button class="btn danger" data-action="delete">Delete</button>
+        </div>
+      </div>
+      <pre class="code"></pre>
+    </div>
+  </template>
+
+  <script>
+    const el = id => document.getElementById(id);
+
+    const REQUIRED = {
+      online: ["citeKey","title","author","year","url"],
+      article: ["citeKey","title","author","journal","year"],
+      book: ["citeKey","title","author","publisher","year"],
+      inproceedings: ["citeKey","title","author","booktitle","year"],
+      misc: ["citeKey"]
+    };
+
+    const FIELD_IDS = [
+      "citeKey","author","title","year","month","journal","booktitle","publisher","editor","volume","number","pages","address","organization","doi","url","howpublished","note"
+    ];
+
+    const LABEL_IDS = {
+      citeKey: 'label-citeKey',
+      author: 'label-author',
+      title: 'label-title',
+      year: 'label-year',
+      journal: 'label-journal',
+      booktitle: 'label-booktitle',
+      publisher: 'label-publisher',
+      url: 'label-url'
+    };
+
+    function normalizeMonth(m){
+      if(!m) return "";
+      const map = {jan:"Jan",feb:"Feb",mar:"Mar",apr:"Apr",may:"May",jun:"Jun",jul:"Jul",aug:"Aug",sep:"Sep",sept:"Sep",oct:"Oct",nov:"Nov",dec:"Dec"};
+      const t = String(m).trim();
+      if(/^[0-9]{1,2}$/.test(t)){
+        const idx = Math.max(1, Math.min(12, parseInt(t,10)));
+        return ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][idx];
+      }
+      const key = t.toLowerCase().slice(0,3);
+      return map[key] || t; // fall back to user text
+    }
+
+    function updateRequiredUI(){
+      const type = el('entryType').value;
+      // clear all
+      Object.values(LABEL_IDS).forEach(id => el(id)?.classList.remove('required'));
+      // mark ones for current type
+      (REQUIRED[type]||[]).forEach(fid => {
+        const lid = LABEL_IDS[fid];
+        if(lid) el(lid).classList.add('required');
+      });
+    }
+	
+	  function currentYear(){
+    return String(new Date().getFullYear());
+  }
+
+  function defaultFor(field, type){
+    const defaults = {
+      author: 'Unknown',
+      title: 'Untitled',
+      year: currentYear(),
+      url: 'https://example.com',
+      journal: 'Unknown journal',
+      publisher: 'Unknown publisher',
+      booktitle: 'Unknown proceedings'
+    };
+    return defaults[field] || '';
+  }
+
+  function generateCiteKey({ author, title, year }){
+    const clean = s =>
+      s.toLowerCase()
+       .replace(/[^a-z0-9\s]/g, '')
+       .trim();
+
+    const firstAuthor =
+      clean(author || 'unknown')
+        .split(/\s+|,/)[0] || 'unknown';
+
+    const titleWord =
+      clean(title || 'untitled')
+        .split(/\s+/)
+        .find(w => w.length > 3) || 'work';
+
+    return `${firstAuthor}-${year || currentYear()}-${titleWord}`;
+  }
+
+function buildEntry(){
+  const type = el('entryType').value;
+
+  const values = Object.fromEntries(
+    FIELD_IDS.map(fid => [fid, el(fid).value.trim()])
+  );
+
+  // Normalize month
+  values.month = normalizeMonth(values.month);
+
+  // Apply defaults for required fields
+  (REQUIRED[type] || []).forEach(fid => {
+    if (!values[fid]) {
+      values[fid] = defaultFor(fid, type);
+    }
+  });
+
+  // Auto-generate citation key if missing
+  if (!values.citeKey) {
+    values.citeKey = generateCiteKey(values);
+  }
+
+  const fieldOrder = [
+    ['author','author'],['editor','editor'],['title','title'],
+    ['journal','journal'],['booktitle','booktitle'],
+    ['publisher','publisher'],['organization','organization'],
+    ['address','address'],['volume','volume'],['number','number'],
+    ['pages','pages'],['year','year'],['month','month'],
+    ['doi','doi'],['url','url'],['howpublished','howpublished'],['note','note']
+  ];
+
+  const lines = [];
+  for (const [key,label] of fieldOrder){
+    const v = values[key];
+    if (v) lines.push(`\t${label}={${v}}`);
+  }
+
+  const inner = lines
+    .map((ln,i) => i < lines.length - 1 ? ln + ',' : ln)
+    .join('\n');
+
+  return `@${type}{\n\t${values.citeKey},\n${inner}\n}`;
+}
+
+    function copyToClipboard(text){
+      navigator.clipboard.writeText(text).then(()=>{
+        toast('Copied to clipboard');
+      }).catch(()=>{
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); toast('Copied'); }catch(e){ alert('Copy failed'); }
+        document.body.removeChild(ta);
+      });
+    }
+
+    function download(filename, content){
+      const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    }
+
+    const STORAGE_KEY = 'bibgen_entries_v1';
+
+    function loadSaved(){
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch { return []; }
+    }
+
+    function saveAll(arr){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      renderSaved();
+    }
+
+    function saveCurrent(){
+      const entry = el('output').value.trim();
+      if(!entry){ alert('Nothing to save. Generate first.'); return; }
+      const keyMatch = entry.match(/^@\w+\{\s*([^,\n]+)\s*,/);
+      const key = keyMatch ? keyMatch[1] : `entry-${Date.now()}`;
+      const items = loadSaved();
+      items.unshift({ key, entry, createdAt: Date.now() });
+      saveAll(items);
+      toast('Saved to browser');
+    }
+
+    function renderSaved(){
+      const list = el('savedList');
+      list.innerHTML = '';
+      const items = loadSaved();
+      el('savedCount').textContent = `${items.length} item${items.length!==1?'s':''}`;
+      const tpl = el('saved-item-template');
+      items.forEach((it, idx)=>{
+        const node = tpl.content.cloneNode(true);
+        node.querySelector('.key').textContent = it.key;
+        node.querySelector('.code').textContent = it.entry;
+        node.querySelector('[data-action="copy"]').addEventListener('click',()=>copyToClipboard(it.entry));
+        node.querySelector('[data-action="download"]').addEventListener('click',()=>download(`${it.key}.bib`, it.entry+"\n"));
+        node.querySelector('[data-action="load"]').addEventListener('click',()=>{ el('output').value = it.entry; toast('Loaded into editor'); });
+        node.querySelector('[data-action="delete"]').addEventListener('click',()=>{
+          const next = loadSaved(); next.splice(idx,1); saveAll(next); toast('Deleted');
+        });
+        list.appendChild(node);
+      });
+    }
+
+    function downloadAll(){
+      const items = loadSaved();
+      if(!items.length){ alert('No saved entries.'); return; }
+      const content = items.map(it=>it.entry).join('\n\n') + '\n';
+      download('references.bib', content);
+    }
+
+    function resetForm(){
+      FIELD_IDS.forEach(fid=>el(fid).value='');
+      el('entryType').value='online';
+      updateRequiredUI();
+    }
+
+    function toast(msg){
+      const n = document.createElement('div');
+      n.textContent = msg;
+      n.style.position='fixed'; n.style.bottom='18px'; n.style.left='50%'; n.style.transform='translateX(-50%)';
+      n.style.background='#0f1530'; n.style.border='1px solid #2a3a73'; n.style.padding='10px 14px'; n.style.borderRadius='12px';
+      n.style.boxShadow='0 8px 30px rgba(0,0,0,.4)'; n.style.zIndex=9999; n.style.opacity='0.97';
+      document.body.appendChild(n); setTimeout(()=>{ n.remove(); }, 1600);
+    }
+
+    // Hook up buttons
+    el('genBtn').addEventListener('click', ()=>{ el('output').value = buildEntry(); });
+    el('copyBtn').addEventListener('click', ()=>{
+      const out = el('output').value.trim();
+      if(!out) { alert('Nothing to copy. Generate first.'); return; }
+      copyToClipboard(out);
+    });
+    el('downloadBtn').addEventListener('click', ()=>{
+      const out = el('output').value.trim();
+      if(!out){ alert('Nothing to download. Generate first.'); return; }
+      const key = (out.match(/^@\w+\{\s*([^,\n]+)\s*,/)||[])[1]||'entry';
+      download(`${key}.bib`, out+"\n");
+    });
+    el('saveBtn').addEventListener('click', saveCurrent);
+    el('resetBtn').addEventListener('click', resetForm);
+    el('downloadAllBtn').addEventListener('click', downloadAll);
+    el('clearAllBtn').addEventListener('click', ()=>{
+      if(confirm('Delete all saved entries?')){ localStorage.removeItem(STORAGE_KEY); renderSaved(); }
+    });
+
+    // Dynamic required UI
+    el('entryType').addEventListener('change', updateRequiredUI);
+
+    // Start with clean form and render saved list
+    window.addEventListener('DOMContentLoaded', ()=>{
+      resetForm(); // clears all fields & sets @online
+      renderSaved();
+      el('citeKey').focus();
+    });
+  </script>
+</body>
+</html>
+
