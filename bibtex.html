@@ -382,6 +382,7 @@ function buildEntry(){
       const items = loadSaved();
       el('savedCount').textContent = `${items.length} item${items.length!==1?'s':''}`;
       const tpl = el('saved-item-template');
+      if (!tpl) return;
       items.forEach((it, idx)=>{
         const node = tpl.content.cloneNode(true);
         node.querySelector('.key').textContent = it.key;
@@ -403,9 +404,13 @@ function buildEntry(){
       download('references.bib', content);
     }
 
+    function clearFormFields(){
+      FIELD_IDS.forEach(fid => el(fid).value = '');
+    }
+
     function resetForm(){
-      FIELD_IDS.forEach(fid=>el(fid).value='');
-      el('entryType').value='online';
+      clearFormFields();
+      el('entryType').value = 'online';
       updateRequiredUI();
     }
 
@@ -438,14 +443,12 @@ function buildEntry(){
       if(confirm('Delete all saved entries?')){ localStorage.removeItem(STORAGE_KEY); renderSaved(); }
     });
 
-    // Dynamic required UI
     el('entryType').addEventListener('change', updateRequiredUI);
 
-    // Start with clean form and render saved list
-    window.addEventListener('DOMContentLoaded', ()=>{
-      resetForm(); // clears all fields & sets @online
+    document.addEventListener('DOMContentLoaded', () => {
+      clearFormFields();
       renderSaved();
-      el('citeKey').focus();
+      updateRequiredUI();
     });
   </script>
   </body>
