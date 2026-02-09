@@ -43,7 +43,7 @@
             </div>
 
             <div class="row g-3 mb-3">
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="entryType">
                 <label class="form-label fw-semibold">Entry type</label>
                 <select id="entryType" class="form-select">
                   <option value="online">@online</option>
@@ -54,7 +54,7 @@
                 </select>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="citeKey">
                 <label class="form-label">Citation key</label>
                 <input id="citeKey" class="form-control" 
                   placeholder="auto-generated if empty">
@@ -62,90 +62,90 @@
             </div>
 
             <div class="row g-3">
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="author">
                 <label class="form-label">Author(s)</label>
                 <input id="author" class="form-control" placeholder="Red Hat">
                 <div class="form-text">Separate multiple authors with
                   <code>and</code></div>
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="title">
                 <label class="form-label">Title</label>
                 <input id="title" class="form-control" placeholder="Example Title"> 
               </div>
 
-              <div class="col-md-4">
+              <div class="col-md-4" data-field="year">
                 <label class="form-label">Year</label>
                 <input id="year" type="number" class="form-control" placeholder="2026">
               </div>
 
-              <div class="col-md-4">
+              <div class="col-md-4" data-field="month">
                 <label class="form-label">Month</label>
                 <input id="month" class="form-control">
               </div>
 
-              <div class="col-md-4">
+              <div class="col-md-4" data-field="journal">
                 <label class="form-label">Journal</label>
                 <input id="journal" class="form-control">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="booktitle">
                 <label class="form-label">Booktitle</label>
                 <input id="booktitle" class="form-control">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="publisher">
                 <label class="form-label">Publisher</label>
                 <input id="publisher" class="form-control">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="url">
                 <label class="form-label">URL</label>
                 <input id="url" class="form-control" placeholder="example.com">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-md-6" data-field="doi">
                 <label class="form-label">DOI</label>
                 <input id="doi" class="form-control">
               </div>
 
-              <div class="col-12">
+              <div class="col-12" data-field="note">
                 <label class="form-label">Note</label>
                 <input id="note" class="form-control">
               </div>
 
               <div class="row g-3 mt-1">
-                <div class="col-md-6">
+                <div class="col-md-6" data-field="editor">
                   <label class="form-label">Editor</label>
                   <input id="editor" class="form-control">
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-3" data-field="volume">
                   <label class="form-label">Volume</label>
                   <input id="volume" class="form-control">
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-3" data-field="number">
                   <label class="form-label">Number</label>
                   <input id="number" class="form-control">
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" data-field="pages">
                   <label class="form-label">Pages</label>
                   <input id="pages" class="form-control" placeholder="12--34">
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" data-field="address">
                   <label class="form-label">Address</label>
                   <input id="address" class="form-control">
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" data-field="organization">
                   <label class="form-label">Organization</label>
                   <input id="organization" class="form-control">
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-6" data-field="howpublished">
                   <label class="form-label">How published</label>
                   <input id="howpublished" class="form-control">
                 </div>
@@ -221,6 +221,14 @@
       misc: ["citeKey"]
     };
 
+    const VISIBLE_FIELDS = {
+      online: ["citeKey","author","title","year","month","url","doi","note"],
+      article: ["citeKey","author","title","journal","year","month","volume","number","pages","doi","url","note"],
+      book: ["citeKey","author","editor","title","publisher","year","month","volume","number","address","doi","url","note"],
+      inproceedings: ["citeKey","author","title","booktitle","year","month","pages","organization","address","doi","url","note"],
+      misc: ["citeKey","author","title","year","howpublished","url","note"]
+    };
+
     const FIELD_IDS = [
       "citeKey","author","title","year","month","journal","booktitle","publisher","editor","volume","number","pages","address","organization","doi","url","howpublished","note"
     ];
@@ -251,11 +259,56 @@
     function updateRequiredUI(){
       const type = el('entryType').value;
       // clear all
-      Object.values(LABEL_IDS).forEach(id => el(id)?.classList.remove('required'));
+      Object.values(LABEL_IDS).forEach(id => {
+        const node = el(id);
+        if (node) node.classList.remove('required');
+      });
       // mark ones for current type
       (REQUIRED[type]||[]).forEach(fid => {
         const lid = LABEL_IDS[fid];
-        if(lid) el(lid).classList.add('required');
+        if(lid){
+          const node = el(lid);
+          if (node) node.classList.add('required');
+        }
+      });
+
+      updateVisibleFields(type);
+    }
+
+    const FIELD_NODES = new Map();
+
+    function cacheFieldNodes(){
+      FIELD_IDS.forEach(fid => {
+        const input = el(fid);
+        const container = input?.closest('[data-field]');
+        if (!container) return;
+        FIELD_NODES.set(fid, {
+          container,
+          parent: container.parentElement,
+          nextSibling: container.nextElementSibling
+        });
+      });
+    }
+
+    function updateVisibleFields(type){
+      const visible = new Set((VISIBLE_FIELDS[type] || FIELD_IDS));
+      FIELD_IDS.forEach(fid => {
+        const meta = FIELD_NODES.get(fid);
+        if (!meta) return;
+        const { container, parent, nextSibling } = meta;
+        const shouldShow = visible.has(fid);
+        const isInDom = container.isConnected;
+        if (shouldShow && !isInDom) {
+          if (nextSibling && nextSibling.parentElement === parent) {
+            parent.insertBefore(container, nextSibling);
+          } else {
+            parent.appendChild(container);
+          }
+        } else if (!shouldShow && isInDom) {
+          const input = el(fid);
+          if (input) input.value = '';
+          container.remove();
+        }
       });
     }
 	
@@ -298,7 +351,7 @@ function buildEntry(){
   const type = el('entryType').value;
 
   const values = Object.fromEntries(
-    FIELD_IDS.map(fid => [fid, el(fid).value.trim()])
+    FIELD_IDS.map(fid => [fid, (el(fid)?.value || '').trim()])
   );
 
   // Normalize month
@@ -454,6 +507,7 @@ function buildEntry(){
 
     document.addEventListener('DOMContentLoaded', () => {
       clearFormFields();
+      cacheFieldNodes();
       renderSaved();
       updateRequiredUI();
     });
