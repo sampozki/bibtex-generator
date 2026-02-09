@@ -6,13 +6,11 @@ You fill in a form, click **Generate**, and get a valid BibTeX entry you can cop
 
 No backend. No tracking. No libraries beyond Bootstrap for layout.
 
----
 
 ## Why?
 
 Decided to vibecode this because while writing my thesis wanted something like this to exist. 
 
----
 
 ## How it works
 
@@ -26,7 +24,6 @@ If you reload the page:
 - the form is cleared
 - saved entries are loaded back automatically
 
----
 
 ## Citation keys
 
@@ -39,8 +36,6 @@ If you reload the page:
 Example: redhat-2025-infrastructure
 
 
----
-
 ## Required fields
 
 Each entry type has required fields (for example `author`, `title`, `year`).
@@ -51,7 +46,6 @@ If you leave a required field empty:
 
 You can always edit the generated BibTeX manually afterwards.
 
----
 
 ## Saving entries
 
@@ -65,7 +59,6 @@ You can always edit the generated BibTeX manually afterwards.
 
 You can also download **all saved entries** as one `.bib` file.
 
----
 
 ## Tech notes
 
@@ -77,7 +70,6 @@ You can also download **all saved entries** as one `.bib` file.
 
 This is meant to stay simple and easy to modify.
 
----
 
 ## License
 
