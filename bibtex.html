@@ -1,164 +1,209 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BibTeX Generator</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header>
-    <h1>LaTeX/BibTeX Source Generator</h1>
-    <p>Fill the fields → generate a <code class="inline">.bib</code> entry. Save entries in your browser and copy with one click.</p>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BibTeX Generator</title>
 
-  <main class="container">
-    <!-- FORM SIDE -->
-    <section class="card">
-      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="row" style="align-items:center;gap:8px">
-          <span class="pill">Simple web app • no libraries</span>
-        </div>
-        <div class="row">
-          <button class="btn ghost" id="downloadAllBtn" title="Download all saved entries as one .bib file">Download All (.bib)</button>
-          <button class="btn danger" id="clearAllBtn" title="Delete all saved entries">Clear Saved</button>
-        </div>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/cyborg/bootstrap.min.css"
+      rel="stylesheet" />
+  </head>
+  <body>
+
+    <header class="text-center py-4">
+      <h1 class="mb-1">LaTeX / BibTeX Source Generator</h1>
+      <p class="text-muted">
+        Fill the fields → generate a <code>.bib</code> entry. Saved locally in
+        your browser.
+      </p>
+    </header>
+
+    <main class="container-xxl mb-5">
+      <div class="row g-4">
+
+        <!-- FORM SIDE -->
+        <section class="col-lg-7">
+          <div class="card p-3">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-secondary">BibTeX</span>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-light btn-sm"
+                  id="downloadAllBtn">Download All (.bib)</button>
+                <button class="btn btn-outline-danger btn-sm"
+                  id="clearAllBtn">Clear Saved</button>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Entry type</label>
+                <select id="entryType" class="form-select">
+                  <option value="online">@online</option>
+                  <option value="article">@article</option>
+                  <option value="book">@book</option>
+                  <option value="inproceedings">@inproceedings</option>
+                  <option value="misc">@misc</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Citation key</label>
+                <input id="citeKey" class="form-control" 
+                  placeholder="auto-generated if empty">
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Author(s)</label>
+                <input id="author" class="form-control" placeholder="Red Hat">
+                <div class="form-text">Separate multiple authors with
+                  <code>and</code></div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Title</label>
+                <input id="title" class="form-control" placeholder="Example Title"> 
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Year</label>
+                <input id="year" type="number" class="form-control" placeholder="2026">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Month</label>
+                <input id="month" class="form-control">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Journal</label>
+                <input id="journal" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Booktitle</label>
+                <input id="booktitle" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Publisher</label>
+                <input id="publisher" class="form-control">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">URL</label>
+                <input id="url" class="form-control" placeholder="example.com">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">DOI</label>
+                <input id="doi" class="form-control">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Note</label>
+                <input id="note" class="form-control">
+              </div>
+
+              <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                  <label class="form-label">Editor</label>
+                  <input id="editor" class="form-control">
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Volume</label>
+                  <input id="volume" class="form-control">
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Number</label>
+                  <input id="number" class="form-control">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Pages</label>
+                  <input id="pages" class="form-control" placeholder="12--34">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Address</label>
+                  <input id="address" class="form-control">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Organization</label>
+                  <input id="organization" class="form-control">
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">How published</label>
+                  <input id="howpublished" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+              <button id="genBtn" class="btn btn-primary">Generate</button>
+              <button id="copyBtn" class="btn btn-secondary">Copy</button>
+              <button id="downloadBtn" class="btn btn-secondary">Download
+                (.bib)</button>
+              <button id="saveBtn" class="btn btn-secondary">Save</button>
+              <button id="resetBtn"
+                class="btn btn-outline-secondary">Reset</button>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label">Output</label>
+              <textarea id="output" class="form-control font-monospace"
+                rows="8"></textarea>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SAVED SIDE -->
+        <section class="col-lg-5">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="mb-0">Saved entries</h5>
+              <span class="text-muted small" id="savedCount">0 items</span>
+            </div>
+
+            <div class="d-flex flex-column gap-2" id="savedList"></div>
+          </div>
+        </section>
+
       </div>
+    </main>
 
-      <div class="row" style="gap:10px;align-items:flex-end;margin-bottom:12px">
-        <div style="flex:1">
-          <label for="entryType" class="required">Entry type</label>
-          <select id="entryType">
-            <option value="online">@online</option>
-            <option value="article">@article</option>
-            <option value="book">@book</option>
-            <option value="inproceedings">@inproceedings</option>
-            <option value="misc">@misc</option>
-          </select>
+    <template id="saved-item-template">
+      <div class="card card-body p-2">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="fw-semibold text-truncate flex-grow-1 key"></span>
+          <div class="d-flex gap-1 flex-nowrap">
+            <button class="btn btn-sm btn-outline-light"
+              data-action="copy">Copy</button>
+            <button class="btn btn-sm btn-outline-light"
+              data-action="download">.bib</button>
+            <button class="btn btn-sm btn-outline-secondary"
+              data-action="load">Load</button>
+            <button class="btn btn-sm btn-outline-danger"
+              data-action="delete">Delete</button>
+          </div>
         </div>
-        <div style="flex:1">
-          <label for="citeKey" id="label-citeKey">Citation key</label>
-          <input id="citeKey" placeholder="e.g. what-is-iac-redhat" />
-        </div>
+        <pre class="mb-0 small code"></pre>
       </div>
+    </template>
 
-      <div class="grid">
-        <div>
-          <label for="author" id="label-author">Author(s)</label>
-          <input id="author" placeholder="Red Hat or Lastname, First and Second, Third" />
-          <div class="hint">Multiple authors separated with <code class="inline">and</code></div>
-        </div>
-        <div>
-          <label for="title" id="label-title">Title</label>
-          <input id="title" placeholder="What is infrastructure as code (IAC)?" />
-        </div>
-        <div>
-          <label for="year" id="label-year">Year</label>
-          <input id="year" type="number" min="1000" max="9999" placeholder="2025" />
-        </div>
-        <div>
-          <label for="month">Month</label>
-          <input id="month" placeholder="Jun or june or 06" />
-        </div>
-        <div>
-          <label for="journal" id="label-journal">Journal</label>
-          <input id="journal" placeholder="Only for @article" />
-        </div>
-        <div>
-          <label for="booktitle" id="label-booktitle">Booktitle</label>
-          <input id="booktitle" placeholder="For @inproceedings" />
-        </div>
-        <div>
-          <label for="publisher" id="label-publisher">Publisher</label>
-          <input id="publisher" placeholder="Publisher / Organization" />
-        </div>
-        <div>
-          <label for="editor">Editor</label>
-          <input id="editor" placeholder="Optional" />
-        </div>
-        <div>
-          <label for="volume">Volume</label>
-          <input id="volume" placeholder="Optional" />
-        </div>
-        <div>
-          <label for="number">Number</label>
-          <input id="number" placeholder="Optional" />
-        </div>
-        <div>
-          <label for="pages">Pages</label>
-          <input id="pages" placeholder="12--34" />
-        </div>
-        <div>
-          <label for="address">Address</label>
-          <input id="address" placeholder="City, Country (optional)" />
-        </div>
-        <div>
-          <label for="organization">Organization</label>
-          <input id="organization" placeholder="Optional" />
-        </div>
-        <div>
-          <label for="doi">DOI</label>
-          <input id="doi" placeholder="10.xxxx/xxxxx" />
-        </div>
-        <div>
-          <label for="url" id="label-url">URL</label>
-          <input id="url" placeholder="https://example.com" />
-        </div>
-        <div>
-          <label for="howpublished">How Published</label>
-          <input id="howpublished" placeholder="Web page, Blog, etc." />
-        </div>
-        <div>
-          <label for="note">Note</label>
-          <input id="note" placeholder="Accessed: 2025-09-02" />
-        </div>
-      </div>
-
-      <div class="spacer"></div>
-      <div class="row">
-        <button id="genBtn" class="btn accent">Generate</button>
-        <button id="copyBtn" class="btn">Copy current</button>
-        <button id="downloadBtn" class="btn">Download current (.bib)</button>
-        <button id="saveBtn" class="btn">Save to browser</button>
-        <button id="resetBtn" class="btn ghost">Reset form</button>
-      </div>
-
-      <div class="spacer"></div>
-      <label for="output">Output</label>
-      <textarea id="output" placeholder="Your generated BibTeX entry will appear here…"></textarea>
-      <div class="hint">Example format:
-        <code class="inline">@online{ what-is-iac-redhat, author={Red Hat}, title={…}, url={…}, year={2025}, month={Jun} }</code>
-      </div>
-    </section>
-
-    <!-- SAVED SIDE -->
-    <section class="card">
-      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
-        <h3 style="margin:0">Saved entries (local)</h3>
-        <span class="hint" id="savedCount">0 items</span>
-      </div>
-      <div class="list" id="savedList"></div>
-    </section>
-  </main>
-
-  <div class="footer">All data stays in your browser (Local Storage). No network calls.</div>
-
-  <template id="saved-item-template">
-    <div class="item">
-      <div class="meta">
-        <span class="key"></span>
-        <div class="row">
-          <button class="btn" data-action="copy">Copy</button>
-          <button class="btn" data-action="download">.bib</button>
-          <button class="btn ghost" data-action="load">Load</button>
-          <button class="btn danger" data-action="delete">Delete</button>
-        </div>
-      </div>
-      <pre class="code"></pre>
-    </div>
-  </template>
-
-  <script>
+    <script>
     const el = id => document.getElementById(id);
 
     const REQUIRED = {
@@ -403,7 +448,5 @@ function buildEntry(){
       el('citeKey').focus();
     });
   </script>
-</body>
+  </body>
 </html>
-
-
