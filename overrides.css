@@ -46,3 +46,33 @@
   padding: 0.75rem;
   background-color: rgba(0, 0, 0, 0.15);
 }
+
+/* Compact the form to reduce vertical space */
+
+.form-compact .row.g-3 {
+  --bs-gutter-x: 0.75rem;
+  --bs-gutter-y: 0.5rem;
+}
+
+.form-compact .form-label {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-compact .form-control,
+.form-compact .form-select {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.form-compact .form-text {
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+.form-compact .btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.1;
+}
